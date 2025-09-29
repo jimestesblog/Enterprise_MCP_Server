@@ -1,0 +1,17 @@
+﻿[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q"
+testpaths = [
+  "tests",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+branch = true
+source = ["mcp_server"]
+
+[tool.coverage.report]
+omit = [
+  "mcp_server/__main__.py",
+]
+show_missing = true

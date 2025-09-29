@@ -1,0 +1,132 @@
+﻿---
+# JWT Authentication Configuration for MCP Server
+# Configure JWT token validation per domain/mount point
+
+# Global authentication settings
+default_enabled: false  # Default authentication state for new domains
+
+# JWT Identity Providers
+providers:
+  # Azure EntraID (Azure AD) provider
+  azure-entraid:
+    name: azure-entraid
+    type: azure-entraid
+    issuer: "https://login.microsoftonline.com/${AZURE_TENANT_ID}/v2.0"
+    tenant_id: "${AZURE_TENANT_ID}"
+    audience: "${AZURE_CLIENT_ID}"
+    algorithms: ["RS256"]
+    verify_exp: true
+    verify_aud: true
+    verify_iss: true
+    # Claims mapping for Azure
+    subject_claim: "sub"
+    email_claim: "email"
+    name_claim: "name"
+    groups_claim: "groups"
+    roles_claim: "roles"
+
+  # AWS IAM Identity Provider (EKS example)
+  aws-iam:
+    name: aws-iam
+    type: aws-iam
+    issuer: "https://oidc.eks.${AWS_REGION}.amazonaws.com/id/${EKS_CLUSTER_ID}"
+    region: "${AWS_REGION}"
+    audience: "sts.amazonaws.com"
+    algorithms: ["RS256"]
+    verify_exp: true
+    verify_aud: true
+    verify_iss: true
+    # Claims mapping for AWS
+    subject_claim: "sub"
+    email_claim: "email"
+    name_claim: "name" 
+    groups_claim: "groups"
+    roles_claim: "https://aws.amazon.com/tags/Role"
+
+  # Generic OIDC provider (e.g., Keycloak, Auth0, etc.)
+  generic-oidc:
+    name: generic-oidc
+    type: oidc
+    issuer: "${OIDC_ISSUER_URL}"
+    audience: "${OIDC_AUDIENCE}"
+    algorithms: ["RS256", "ES256"]
+    verify_exp: true
+    verify_aud: true
+    verify_iss: true
+    leeway: 30  # 30 seconds leeway for time-based claims
+    # Custom claims mapping
+    subject_claim: "sub"
+    email_claim: "email"
+    name_claim: "preferred_username"
+    groups_claim: "groups"
+    roles_claim: "realm_access.roles"
+
+  # Development/Testing provider (for testing only - not for production)
+  dev-provider:
+    name: dev-provider
+    type: oidc
+    issuer: "http://localhost:8080/auth/realms/dev"
+    audience: "mcp-server"
+    algorithms: ["RS256"]
+    verify_exp: false  # Disable expiration check for dev
+    verify_aud: true
+    verify_iss: true
+    subject_claim: "sub"
+    email_claim: "email"
+    name_claim: "name"
+    groups_claim: "groups"
+    roles_claim: "roles"
+
+# Per-domain authentication configuration
+domains:
+  # Weather domain - protected with Azure EntraID
+  WEATHER:
+    enabled: false
+    required: false
+    provider: azure-entraid
+    require_groups: ["weather-users", "api-users"]
+    require_roles: []
+    required_claims: {}
+
+  # Use Case X - protected with AWS IAM
+  USECASEX:
+    enabled: false
+    required: false
+    provider: aws-iam
+    require_groups: []
+    require_roles: ["ReadOnlyAccess", "PowerUserAccess"]
+    required_claims:
+      "aws:account": "123456789012"
+
+  # Use Case Y - protected with generic OIDC
+  USECASEY:
+    enabled: false
+    required: false  # Optional authentication
+    provider: generic-oidc
+    require_groups: ["users"]
+    require_roles: ["user", "admin"]
+    required_claims: {}
+
+  # Development domain - less secure for testing
+  DEVELOPMENT:
+    enabled: true
+    required: false
+    provider: dev-provider
+    require_groups: []
+    require_roles: []
+    required_claims: {}
+
+  # Public domain - no authentication
+  PUBLIC:
+    enabled: false
+    required: false
+    provider: null
+
+# Example environment variables to set:
+# AZURE_TENANT_ID=your-azure-tenant-id
+# AZURE_CLIENT_ID=your-azure-client-id
+# AWS_REGION=us-east-1
+# EKS_CLUSTER_ID=your-eks-cluster-id
+# OIDC_ISSUER_URL=https://your-oidc-provider.com
+# OIDC_AUDIENCE=your-audience
+# AUTH_CONFIG_PATH=/path/to/auth.yaml (optional, defaults to config/auth.yaml)

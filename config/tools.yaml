@@ -1,0 +1,177 @@
+﻿---
+# New-style MCP tools configuration using Domains and tool_classes
+# Each domain is mounted under /mcp/{slug} where slug is a lowercase, hyphenated version of the Name
+
+Domains:
+  - Name: WEATHER
+    Description: Weather and geocoding tools via Google Weather and Maps APIs
+  - Name: USECASEX
+    Description: Collection of Tools for use case X. including Weather and geocoding tools via Google Weather and Maps APIs
+
+# Tools are registered by class; each listed method becomes a tool named {class_name}.{function}
+# Class initialization accepts a dict (here using legacy-style conf under `params`).
+
+mcp_classes:
+  - Domain: WEATHER
+    class_type: mcp_weather_tool.google_weather.GoogleWeatherTool
+    class_name: google_weather
+    class_description: Google Weather API tools for current conditions, hourly and 10-day daily forecasts.
+    class_initialization_params:
+      params:
+        api_key: "${GOOGLE_WEATHER_API_KEY}"
+        # Default preferences (can be overridden per call)
+        unitsSystem: imperial
+        language: en
+        # Optional geocoding of human-readable locations (uses Google Maps Geocoding API)
+        geocoding_enabled: true
+        geocoding_api_key: "${GOOGLE_GEOCODING_API_KEY}"
+        # Base URL for the Google Weather API
+        base_url: https://weather.googleapis.com/v1
+    tools:
+      - function: _current_conditions
+        function_description: Get current conditions for a latitude/longitude with optional units and language.
+        tool_parameters:
+          - name: latitude
+            description: Latitude in decimal degrees.
+            allowed_values: string
+          - name: longitude
+            description: Longitude in decimal degrees.
+            allowed_values: string
+          - name: unitsSystem
+            description: Unit system to use (imperial or metric). Defaults to class default.
+            allowed_values: [imperial, metric]
+          - name: language
+            description: BCP-47 language code for localized output. Defaults to class default.
+            allowed_values: string
+      - function: _hourly_forecast
+        function_description: Get hourly forecast for a latitude/longitude for the next N hours.
+        tool_parameters:
+          - name: latitude
+            description: Latitude in decimal degrees.
+            allowed_values: string
+          - name: longitude
+            description: Longitude in decimal degrees.
+            allowed_values: string
+          - name: unitsSystem
+            description: Unit system to use (imperial or metric). Defaults to class default.
+            allowed_values: [imperial, metric]
+          - name: language
+            description: BCP-47 language code for localized output. Defaults to class default.
+            allowed_values: string
+          - name: hours
+            description: Number of hours to return forecast for. Defaults to 48.
+            allowed_values: number
+      - function: _daily_forecast
+        function_description: Get daily forecast for a latitude/longitude for the next N days.
+        tool_parameters:
+          - name: lat
+            description: Latitude in decimal degrees.
+            allowed_values: string
+          - name: lon
+            description: Longitude in decimal degrees.
+            allowed_values: string
+          - name: unitsSystem
+            description: Unit system to use (imperial or metric). Defaults to class default.
+            allowed_values: [imperial, metric]
+          - name: language
+            description: BCP-47 language code for localized output. Defaults to class default.
+            allowed_values: string
+      - function: _geocode
+        function_description: Geocode a human-readable address or place name into latitude and longitude.
+        tool_parameters:
+          - name: address
+            description: Address or place name to geocode.
+            allowed_values: string
+  - Domain: USECASEX
+    class_type: mcp_weather_tool.google_weather.GoogleWeatherTool
+    class_name: google_weather
+    class_description: Google Weather API tools for current conditions, hourly and 10-day daily forecasts.
+    class_initialization_params:
+      params:
+        api_key: "${GOOGLE_WEATHER_API_KEY}"
+        # Default preferences (can be overridden per call)
+        unitsSystem: imperial
+        language: en
+        # Optional geocoding of human-readable locations (uses Google Maps Geocoding API)
+        geocoding_enabled: true
+        geocoding_api_key: "${GOOGLE_GEOCODING_API_KEY}"
+        # Base URL for the Google Weather API
+        base_url: https://weather.googleapis.com/v1
+    tools:
+      - function: _current_conditions
+        function_description: Get current conditions for a latitude/longitude with optional units and language.
+        tool_parameters:
+          - name: latitude
+            description: Latitude in decimal degrees.
+            allowed_values: string
+          - name: longitude
+            description: Longitude in decimal degrees.
+            allowed_values: string
+          - name: unitsSystem
+            description: Unit system to use (imperial or metric). Defaults to class default.
+            allowed_values: [imperial, metric]
+          - name: language
+            description: BCP-47 language code for localized output. Defaults to class default.
+            allowed_values: string
+  - Domain: USECASEY
+    class_type: mcp_weather_tool.google_weather.GoogleWeatherTool
+    class_name: google_weather
+    class_description: Google Weather API tools for current conditions, hourly and 10-day daily forecasts.
+    class_initialization_params:
+      params:
+        api_key: "${GOOGLE_WEATHER_API_KEY}"
+        # Default preferences (can be overridden per call)
+        unitsSystem: imperial
+        language: en
+        # Optional geocoding of human-readable locations (uses Google Maps Geocoding API)
+        geocoding_enabled: true
+        geocoding_api_key: "${GOOGLE_GEOCODING_API_KEY}"
+        # Base URL for the Google Weather API
+        base_url: https://weather.googleapis.com/v1
+    tools:
+      - function: _current_conditions
+        function_description: Get current conditions for a latitude/longitude with optional units and language.
+        tool_parameters:
+          - name: latitude
+            description: Latitude in decimal degrees.
+            allowed_values: string
+          - name: longitude
+            description: Longitude in decimal degrees.
+            allowed_values: string
+          - name: unitsSystem
+            description: Unit system to use (imperial or metric). Defaults to class default.
+            allowed_values: [imperial, metric]
+          - name: language
+            description: BCP-47 language code for localized output. Defaults to class default.
+            allowed_values: string
+  - Domain: USECASEY
+    class_type: mcp_example_resources.publichttpresource.HttpResource
+    class_name: http_resources
+    class_description: Public example resource types.
+    class_initialization_params:
+      params:
+    tools:
+    resources:
+      - name: weather_data
+        description: static weather data.
+        type: csv
+        access: public
+        uri: https://raw.githubusercontent.com/velicki/Weather_Data_Analysis_Project/refs/heads/main/Weather_Data.csv
+  - Domain: USECASEY
+    class_type: mcp_example_resources.privateresourceexample.ExamplePrivateResources
+    class_name: example_private_resources
+    class_description: Example private resource types.
+    class_initialization_params:
+      params:
+    tools:
+    resources:
+      - name: sample_parameterized_resource
+        description: sample parameterized resource.
+        function: _sample_parameterized_resource
+        type: txt
+        access: mcp_server
+        uri: //sampledata/{client}/
+        resource_parameters:
+          - name: client
+            description: Client ID.
+            allowed_values: string  

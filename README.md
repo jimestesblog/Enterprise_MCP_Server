@@ -4,6 +4,8 @@
 
  Example of a  highly configurable, deployment-ready Model Context Protocol (MCP) server built with Python and FastAPI. This server provides a **fully modular architecture** where tools and resources can be developed as **external packages**, installed independently, and configured dynamically without code changes. The server enables seamless communication with MCP-compatible clients through its extensible plugin system.
 
+## Related Repositories
+https://github.com/jimestesblog/mcp_weather_tool
 ## Features
 
 - **🏗️ Modular Architecture**: Clean separation of concerns with dedicated modules for core functionality, server components, tools, and utilities

@@ -6,6 +6,7 @@
 
 ## Related Repositories
 https://github.com/jimestesblog/mcp_weather_tool
+https://github.com/jimestesblog/mcp_example_resources
 ## Features
 
 - **🏗️ Modular Architecture**: Clean separation of concerns with dedicated modules for core functionality, server components, tools, and utilities
